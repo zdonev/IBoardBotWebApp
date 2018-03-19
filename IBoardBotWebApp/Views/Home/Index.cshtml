@@ -1,0 +1,171 @@
+﻿@model IBoardBotWebApp.Models.Paramters
+
+@{
+    ViewBag.Title = "Home Page";
+}
+<script type="text/javascript">
+
+    //appid = @Model.AppId;
+    //var appid = @Model.AppId;
+
+    var count = 30;
+    var flipflag = 0;
+    var currentModal = '';
+
+    var admireTimerValue = @Model.AdmireTimerValue;
+    var drawTimerValue = @Model.DrawTimerValue;
+    var eraseTimerValue = @Model.EraseTimerValue;
+
+    var counter;
+
+    function CloseModal(modalwindow) {
+        $('#' + modalwindow).modal('hide');
+        currentModal = "";
+        if (modalwindow == 'admirework') {
+            ShowModal(eraseTimerValue, 'ereaseboard');
+            //clear_queue();
+            //clear_function();
+
+            //call erase 2X
+            erase_function();
+            erase_function();
+        }
+        if (modalwindow == 'ereaseboard') {
+            $('#startdraw').modal('show');
+            counter = setInterval(FlashStart, 500); //1000 will  run it every 1 second
+        }
+
+    };
+
+    function FlashStart() {
+
+        if (flipflag == 0) {
+            document.getElementById("startdrawdiv").style.backgroundColor = "green";
+            flipflag = 1;
+        }
+        else {
+            document.getElementById("startdrawdiv").style.backgroundColor = "green";
+            flipflag = 0;
+        }
+    };
+
+    function StartDrawing() {
+
+        clearInterval(counter);
+        $('#startdraw').modal('hide');
+        counter = setInterval(drawtimer, 1000);
+        count = drawTimerValue;
+        add_events();
+
+    };
+
+    function ShowModal(seconds, modalwindow) {
+
+        $('#' + modalwindow).modal('show');
+
+        currentModal = modalwindow;
+        counter = setInterval(timer, 1000); //1000 will  run it every 1 second
+        count = seconds;
+    };
+
+
+
+    function timer() {
+        count = count - 1;
+        if (count <= 0) {
+            clearInterval(counter);
+            document.getElementById(currentModal + "_timer").innerHTML = 'Please wait...';
+            CloseModal(currentModal);            
+            return;
+        }
+
+        document.getElementById(currentModal + "_timer").innerHTML = count; // watch for spelling
+    }
+
+    function drawtimer() {
+        count = count - 1;
+        if (count <= 0) {
+            clearInterval(counter);
+            ShowModal(admireTimerValue, 'admirework');
+            document.getElementById("draw_timer").innerHTML = "0";
+            start_position();
+            remove_events();
+            return;
+        }
+
+        document.getElementById("draw_timer").innerHTML = count; // watch for spelling
+    }
+
+
+
+</script>
+
+@*<button type="button" id="startmodal" class="btn btn-primary btn-lg" onclick="ShowModal(3, 'admirework');">Start</button>*@
+
+
+<p class="timer" id="draw_timer"></p>
+
+
+
+<!-- Modal start-->
+
+<div class="modal modal-wide fade" id="startdraw" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- to create more modals copy-paste from the div class "modal fade" until here, you can customize moda-content with css-->
+            @*<div class="modal-header">
+                <h1 class="timer-header">__!</h1>
+                
+            </div>*@
+            <div id="startdrawdiv" class="modal-body">
+                @*<button id="" type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="ShowModal(10, 'admirework')">Click here to start drawing!</button>*@
+                <p class="timer" id="startdraw_timer" onclick="StartDrawing();">Click here to start drawing.</p>
+            </div>
+            @*<div class="modal-footer">
+                Please wait!
+            </div>*@
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-wide fade" id="admirework" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- to create more modals copy-paste from the div class "modal fade" until here, you can customize moda-content with css-->
+            <div class="modal-header">
+                <h1 class="timer-header">Admire your work.</h1>
+                @*<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>*@
+            </div>
+            <div class="modal-body timer-admire">
+
+                <p class="timer" id="admirework_timer">Please wait...</p>
+
+            </div>
+            <div class="modal-footer">
+                Please wait!
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal modal-wide fade" id="ereaseboard" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- to create more modals copy-paste from the div class "modal fade" until here, you can customize moda-content with css-->
+            <div class="modal-header">
+                <h1 class="timer-header">Erasing.</h1>
+                @*<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>*@
+            </div>
+            <div class="modal-body timer-erase">
+
+                <p class="timer" id="ereaseboard_timer">Please wait...</p>
+
+            </div>
+            <div class="modal-footer">
+                Please wait!
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal end-->
